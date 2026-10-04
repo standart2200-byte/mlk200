@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Məktəb-Lisey — Qeydiyyat</title>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<form class="card" id="f">
+  <h2>Yeni Hesab</h2>
+  <p class="sub">Söhbətə qoşulmaq üçün qeydiyyatdan keçin</p>
+  <label>Ad və Soyad</label>
+  <input id="name" required minlength="2" maxlength="40" placeholder="Əli Məmmədov">
+  <label>İstifadəçi adı</label>
+  <input id="user" required autocapitalize="none" placeholder="ali_200">
+  <div class="hint">4–20 simvol: a-z, 0-9 və _ (sonradan dəyişdirilə bilməz)</div>
+  <label>Şifrə</label>
+  <input id="pass" type="password" required autocomplete="new-password">
+  <div class="hint">Min. 6 simvol, 1 böyük hərf, 1 kiçik hərf, 1 rəqəm</div>
+  <label>Sektor</label>
+  <select id="sector" required>
+    <option value="" disabled selected>Sektor seçin</option>
+    <option value="az">Azərbaycan sektoru</option>
+    <option value="ru">Rus sektoru</option>
+  </select>
+  <label>Sinif</label>
+  <input id="cls" required maxlength="10" placeholder="9 'A'">
+  <label>Təhlükəsizlik sualı: <span id="q"></span></label>
+  <input id="cap" type="number" required>
+  <button class="go" id="b">Qeydiyyatdan keç</button>
+  <div id="m"></div>
+  <div class="links">Artıq hesabınız var? <a href="login.html">Daxil olun</a></div>
+</form>
+<script type="module">
+import { auth, db, toEmail } from './firebase.js';
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const $ = id => document.getElementById(id), m = $('m'), b = $('b');
+const n1 = 1 + Math.floor(Math.random() * 10), n2 = 1 + Math.floor(Math.random() * 10);
+$('q').textContent = `${n1} + ${n2} = ?`;
+const fail = t => { m.style.color = '#dc2626'; m.textContent = '❌ ' + t; b.disabled = false; };
+
+$('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  b.disabled = true;
+  const username = $('user').value.trim().toLowerCase(), pass = $('pass').value;
+  if (+$('cap').value !== n1 + n2) return fail('Təhlükəsizlik sualının cavabı səhvdir!');
+  if (!/^[a-z0-9_]{4,20}$/.test(username)) return fail("İstifadəçi adı: 4–20 simvol, yalnız a-z, 0-9 və '_'!");
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(pass)) return fail('Şifrə tələblərə cavab vermir!');
+
+  m.style.color = '#1e3a8a'; m.textContent = 'Qeydiyyat aparılır...';
+  try {
+    // Auth guarantees the username is unique (the derived email must be unused).
+    const cred = await createUserWithEmailAndPassword(auth, toEmail(username), pass);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name: $('name').value.trim(), username, sector: $('sector').value,
+      schoolClass: $('cls').value.trim(), photoURL: '', createdAt: serverTimestamp()
+    });
+    location.href = 'chat.html';
+  } catch (err) {
+    fail(err.code === 'auth/email-already-in-use' ? 'Bu istifadəçi adı artıq məşğuldur!' : 'Xəta baş verdi: ' + err.code);
+  }
+});
+</script>
+</body>
+</html>
