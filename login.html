@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Məktəb-Lisey — Giriş</title>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<form class="card" id="f">
+  <h2>Hesaba Giriş</h2>
+  <p class="sub">İstifadəçi adı və şifrənizi daxil edin</p>
+  <label>İstifadəçi adı</label>
+  <input id="u" required autocomplete="username" autocapitalize="none" placeholder="ali_200">
+  <label>Şifrə</label>
+  <input id="p" type="password" required autocomplete="current-password">
+  <button class="go" id="b">Daxil ol</button>
+  <div id="m"></div>
+  <div class="links">Hesabınız yoxdur? <a href="register.html">Qeydiyyatdan keçin</a></div>
+</form>
+<script type="module">
+import { auth, toEmail } from './firebase.js';
+import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const m = document.getElementById('m'), b = document.getElementById('b');
+onAuthStateChanged(auth, u => { if (u) location.replace('chat.html'); });
+
+document.getElementById('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  b.disabled = true; m.style.color = '#1e3a8a'; m.textContent = 'Yoxlanılır...';
+  try {
+    await signInWithEmailAndPassword(auth, toEmail(document.getElementById('u').value.trim().toLowerCase()), document.getElementById('p').value);
+  } catch (err) {
+    m.style.color = '#dc2626';
+    m.textContent = err.code === 'auth/too-many-requests'
+      ? '❌ Çox cəhd. Bir az sonra yenidən cəhd edin.'
+      : '❌ İstifadəçi adı və ya şifrə səhvdir!';
+    b.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
