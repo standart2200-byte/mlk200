@@ -1,0 +1,15 @@
+:root{--pri:#1e3a8a;--bd:#e5e7eb;--mut:#6b7280}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#1f2937;display:flex;justify-content:center;align-items:center;min-height:100dvh;padding:20px}
+.card{background:#fff;padding:32px;border-radius:16px;width:100%;max-width:420px;border:1px solid var(--bd);box-shadow:0 10px 25px -5px rgba(0,0,0,.05)}
+h2{color:var(--pri);text-align:center;margin-bottom:6px}
+.sub{font-size:13px;color:var(--mut);text-align:center;margin-bottom:22px}
+label{display:block;font-size:12px;font-weight:700;color:var(--mut);margin:14px 0 5px}
+input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--bd);font-size:16px;background:#fafafa;outline:none}
+input:focus,select:focus{border-color:var(--pri);background:#fff;box-shadow:0 0 0 3px rgba(30,58,138,.1)}
+button.go{width:100%;margin-top:20px;padding:14px;border:0;border-radius:10px;background:var(--pri);color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+button.go:disabled{opacity:.6}
+#m{margin-top:14px;font-size:13px;text-align:center;font-weight:600;min-height:18px}
+.links{text-align:center;margin-top:18px;font-size:13px}
+.links a{color:var(--pri);font-weight:600;text-decoration:none}
+.hint{font-size:11px;color:var(--mut);margin-top:4px}
