@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Məktəb-Lisey</title>
+<style>
+:root{--bg:#111b21;--head:#202c33;--pri:#00a884;--tx:#e9edef;--mut:#8696a0;--bd:#222d34;--inp:#2a3942;--out:#005c4b;--in:#202c33;--sel:#2a3942;--wall:#0b141a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Segoe UI',Helvetica,system-ui,sans-serif;background:#0c1317;color:var(--tx);overflow:hidden}
+button{font-family:inherit;transition:background .15s,transform .1s,opacity .15s}
+button:active{transform:scale(.94)}
+.app{display:flex;height:100dvh;max-width:1700px;margin:auto;background:var(--bg)}
+@media(min-width:1024px){.app{height:calc(100dvh - 38px);margin:19px auto;border-radius:6px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.55)}}
+.hidden{display:none!important}
+
+.rail{width:64px;background:var(--head);display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:12px 0;border-right:1px solid var(--bd)}
+.rail-top{display:flex;flex-direction:column;gap:6px}
+.ic{position:relative;width:42px;height:42px;border-radius:50%;border:0;background:none;color:var(--mut);cursor:pointer;display:grid;place-items:center}
+.ic svg{width:24px;height:24px;fill:currentColor}
+.ic:hover,.ic.on{background:#2a3942;color:var(--tx)}
+.av{width:49px;height:49px;border-radius:50%;background:#6a7175;display:grid;place-items:center;font-weight:600;font-size:19px;flex-shrink:0;overflow:hidden;color:#fff}
+.av img{width:100%;height:100%;object-fit:cover}
+.rail .av{width:34px;height:34px;font-size:15px;cursor:pointer}
+
+.side{width:420px;max-width:38%;min-width:320px;display:flex;flex-direction:column;border-right:1px solid var(--bd);min-height:0}
+.ph{height:59px;padding:0 20px;display:flex;align-items:center;gap:14px;font-size:22px;font-weight:700;flex-shrink:0}
+.sb{padding:7px 12px 8px}
+.sbx{display:flex;align-items:center;gap:14px;background:var(--head);border-radius:8px;padding:0 14px;height:36px;transition:box-shadow .2s}
+.sbx:focus-within{box-shadow:0 0 0 2px var(--pri)}
+.sbx svg{width:17px;height:17px;fill:var(--mut)}
+.sbx input{flex:1;background:none;border:0;outline:none;color:var(--tx);font-size:14px}
+.list{flex:1;overflow-y:auto}
+.item{display:flex;align-items:center;gap:15px;padding:0 15px;cursor:pointer;height:72px;transition:background .15s}
+.item:hover{background:var(--head)}.item.on{background:var(--sel)}
+.item .body{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--bd)}
+.row1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.t{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--pri)}
+.item.unread .t{font-weight:700}.item.unread .tm{color:var(--pri)}
+.s{font-size:14px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.empty{padding:24px;text-align:center;color:var(--mut);font-size:14px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#374248;border-radius:3px}
+
+.prof{flex:1;overflow-y:auto;min-height:0}
+.box{padding:14px 30px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.box small{display:block;color:var(--mut);font-size:14px;margin-bottom:8px}
+.box span{font-size:17px}
+.box button{background:none;border:0;color:var(--mut);cursor:pointer;font-size:18px}
+.pbtn{display:block;width:100%;text-align:left;padding:16px 30px;background:none;border:0;color:var(--tx);font-size:16px;cursor:pointer}
+.pbtn:hover{background:var(--head)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--wall);position:relative}
+.ch{background:var(--head);padding:0 16px;display:flex;align-items:center;gap:15px;height:59px;flex-shrink:0}
+.ch .av{width:40px;height:40px;font-size:16px}
+.ch .nm{font-size:16px}.ch .sub{font-size:13px;color:var(--mut)}
+.back{display:none;background:none;border:0;color:var(--mut);cursor:pointer}
+.back svg{width:24px;height:24px;fill:currentColor}
+.msgs{flex:1;overflow-y:auto;padding:14px 7% 10px;display:flex;flex-direction:column;overscroll-behavior:contain;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.035' stroke-width='1.5'%3E%3Ccircle cx='14' cy='14' r='6'/%3E%3Cpath d='M52 10l10 10M62 10L52 20'/%3E%3Cpath d='M12 56q8-12 16 0'/%3E%3Crect x='50' y='50' width='12' height='12' rx='3'/%3E%3C/g%3E%3C/svg%3E")}
+.day{align-self:center;background:var(--head);color:var(--mut);font-size:12.5px;padding:5px 12px;border-radius:7px;margin:10px 0;box-shadow:0 1px .5px rgba(0,0,0,.3)}
+.more{align-self:center;background:var(--head);color:var(--pri);border:0;padding:7px 16px;border-radius:16px;cursor:pointer;margin-bottom:8px;font-size:13px}
+.msg{max-width:65%;min-width:64px;padding:6px 8px 7px 9px;border-radius:8px;font-size:14.2px;line-height:19px;word-break:break-word;position:relative;white-space:pre-wrap;margin-top:2px;box-shadow:0 1px .5px rgba(0,0,0,.3)}
+.msg.new{animation:pop .2s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.msg.in{background:var(--in);align-self:flex-start}
+.msg.out{background:var(--out);align-self:flex-end}
+.msg.first{margin-top:8px}
+.msg.first.in{border-top-left-radius:0}.msg.first.out{border-top-right-radius:0}
+.msg.first::before{content:'';position:absolute;top:0;width:8px;height:13px}
+.msg.first.in::before{left:-8px;background:var(--in);clip-path:polygon(100% 0,100% 100%,0 0)}
+.msg.first.out::before{right:-8px;background:var(--out);clip-path:polygon(0 0,100% 0,0 100%)}
+.who{font-size:12.8px;font-weight:600;margin-bottom:2px}
+.msg a{color:#53bdeb;text-decoration:none}.msg a:hover{text-decoration:underline}
+.quote{background:rgba(0,0,0,.2);border-left:4px solid var(--pri);border-radius:5px;padding:4px 8px;margin:0 0 4px;font-size:13px;white-space:normal}
+.quote b{display:block;color:var(--pri);font-size:12.5px}.quote span{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta{float:right;margin:6px -2px -5px 12px;font-size:11px;color:rgba(233,237,239,.6);display:flex;align-items:center;gap:3px;height:15px}
+.tick{color:#53bdeb;font-size:13px;letter-spacing:-3px}.tick.p{color:rgba(233,237,239,.6);letter-spacing:0;font-size:11px}
+.acts{display:none;position:absolute;top:2px;right:4px;gap:2px;background:inherit;border-radius:8px;padding:1px}
+.acts button{background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:5px}
+.acts button:hover{background:rgba(255,255,255,.1);color:var(--tx)}
+.msg:hover .acts,.msg.sel .acts{display:flex}
+.sk{height:34px;border-radius:8px;margin:5px 0;max-width:55%;background:linear-gradient(90deg,#1a252c 25%,#233039 50%,#1a252c 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+.sk.r{align-self:flex-end}
+@keyframes sh{to{background-position:-200% 0}}
+.down{position:absolute;right:20px;bottom:80px;width:42px;height:42px;border-radius:50%;background:var(--head);border:0;color:var(--mut);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.4);display:grid;place-items:center;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s}
+.down.show{opacity:1;pointer-events:auto;transform:none}.down svg{width:24px;height:24px;fill:currentColor}
+.down i{position:absolute;top:-6px;right:-2px;background:var(--pri);color:#111b21;font:700 11px/18px sans-serif;min-width:18px;border-radius:9px;text-align:center;font-style:normal}
+
+.rbar{display:flex;align-items:center;gap:10px;background:var(--head);padding:8px 14px 0}
+.rbar .quote{flex:1;margin:0;min-width:0}.rbar button{background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer}
+.emo{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;background:var(--head);padding:8px 14px;max-height:170px;overflow-y:auto;border-top:1px solid var(--bd)}
+.emo button{background:none;border:0;font-size:24px;cursor:pointer;padding:4px;border-radius:6px}.emo button:hover{background:var(--inp)}
+form{background:var(--head);padding:8px 14px calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;align-items:flex-end}
+form textarea{flex:1;background:var(--inp);border:0;border-radius:22px;padding:11px 16px;color:var(--tx);font-size:15px;line-height:20px;font-family:inherit;outline:none;resize:none;max-height:120px;height:42px}
+form textarea::placeholder{color:var(--mut)}
+.eb{width:42px;height:42px;background:none;border:0;font-size:24px;cursor:pointer;border-radius:50%}.eb:hover{background:var(--inp)}
+.send{width:42px;height:42px;border-radius:50%;background:var(--pri);border:0;cursor:pointer;display:grid;place-items:center;flex-shrink:0}
+.send svg{width:22px;height:22px;fill:#111b21}
+
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:50;animation:fi .15s}
+@keyframes fi{from{opacity:0}}
+.dlg{background:var(--head);border-radius:12px;padding:22px;width:min(380px,90vw);animation:pop .2s}
+.dlg h3{font-size:17px;margin-bottom:14px;font-weight:600}
+.dlg input{width:100%;background:var(--inp);border:0;border-bottom:2px solid var(--pri);color:var(--tx);padding:10px;font-size:16px;outline:none;border-radius:6px 6px 0 0;margin-bottom:6px}
+.dbt{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+.dbt button{border:0;border-radius:18px;padding:9px 18px;font-size:14px;cursor:pointer;background:none;color:var(--pri)}
+.dbt .pri{background:var(--pri);color:#111b21;font-weight:600}.dbt .dng{background:#f15c6d;color:#fff;font-weight:600}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#323b41;padding:11px 20px;border-radius:8px;opacity:0;pointer-events:none;transition:.25s;z-index:60;font-size:14px;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.onl{margin-left:auto;font-size:13px;font-weight:500;color:var(--pri);display:flex;align-items:center;gap:6px}
+.onl:empty{display:none}
+.onl::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--pri);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,168,132,.6)}70%,100%{box-shadow:0 0 0 7px rgba(0,168,132,0)}}
+.av.on{outline:2px solid var(--pri);outline-offset:2px}
+.clk{cursor:pointer}
+.typing{color:var(--pri)!important}
+.mav{position:absolute;left:-40px;top:0;width:30px!important;height:30px!important;font-size:13px!important}
+.msgs.grp .msg.in{margin-left:40px}
+.who{cursor:pointer}.who:hover{text-decoration:underline}
+.info{position:absolute;top:0;right:0;bottom:0;width:340px;max-width:100%;background:var(--bg);border-left:1px solid var(--bd);z-index:20;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto}
+.info.show{transform:none}
+.info .top{display:flex;align-items:center;gap:18px;background:var(--head);height:59px;padding:0 16px;font-size:16px}
+.info .top button{background:none;border:0;color:var(--mut);font-size:20px;cursor:pointer}
+.info .big{display:flex;flex-direction:column;align-items:center;padding:28px 20px 18px;gap:4px}
+.info .big .av{width:180px;height:180px;font-size:72px}
+.info h3{font-size:22px;font-weight:500;margin-top:12px}
+.info .rw{padding:14px 26px;border-top:8px solid #0b141a}
+.info .rw small{color:var(--mut);display:block;font-size:13px;margin-bottom:4px}
+.info .btn{display:block;width:100%;text-align:left;padding:15px 26px;border:0;border-top:1px solid var(--bd);background:none;color:var(--tx);font-size:15px;cursor:pointer}
+.info .btn:hover{background:var(--head)}.info .btn.red{color:#f15c6d}
+@media(max-width:767px){.info{width:100%}.mav{left:-36px}.msgs.grp .msg.in{margin-left:36px}}
+
+@media(max-width:767px){
+  .app{flex-direction:column}
+  .rail{order:3;width:100%;flex-direction:row;padding:4px 24px;border:0;border-top:1px solid var(--bd)}
+  .rail-top{flex-direction:row;gap:18px}
+  .side{width:100%;max-width:none;flex:1;border:0}
+  .main{display:none}
+  .app.in-chat .main{display:flex;height:100dvh}
+  .app.in-chat .side,.app.in-chat .rail{display:none}
+  .back{display:block}
+  .msgs{padding:10px}.msg{max-width:86%}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="rail">
+    <div class="rail-top">
+      <button class="ic" id="tab-dm" title="Söhbətlər"><svg viewBox="0 0 24 24"><path d="M19 2H5a2 2 0 0 0-2 2v18l4-4h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg></button>
+      <button class="ic on" id="tab-rooms" title="İcmalar"><svg viewBox="0 0 24 24"><path d="M16 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm-8 0a3 3 0 1 0-3-3 3 3 0 0 0 3 3zm0 2c-2.3 0-7 1.2-7 3.5V19h14v-2.5C15 14.2 10.3 13 8 13zm8 0c-.3 0-.6 0-1 .1 1.2.8 2 2 2 3.4V19h6v-2.5c0-2.3-4.7-3.5-7-3.5z"/></svg></button>
+    </div>
+    <div class="av" id="railav" title="Profil"></div>
+  </div>
+
+  <div class="side">
+    <div id="listview" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div class="ph"><span id="ptitle">İcmalar</span><span class="onl" id="onl"></span></div>
+      <div class="sb"><div class="sbx">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.5l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg>
+        <input id="search" placeholder="Axtar və ya yeni söhbət başlat">
+      </div></div>
+      <div class="list" id="list"></div>
+    </div>
+    <div class="prof hidden" id="profview">
+      <div class="ph" style="background:var(--head);height:108px;align-items:flex-end;padding-bottom:16px;font-size:19px">
+        <button class="back" style="display:block" id="pback"><svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg></button><span>Profil</span>
+      </div>
+      <div style="display:flex;justify-content:center;padding:28px 0"><div class="av" id="pav" style="width:200px;height:200px;font-size:80px"></div></div>
+      <div class="box"><div><small>Ad və Soyad</small><span id="pname"></span></div><button id="ename">✎</button></div>
+      <div class="box"><div><small>İstifadəçi adı</small><span id="puser"></span></div></div>
+      <div class="box"><div><small>Sinif və Sektor</small><span id="pclass"></span></div></div>
+      <div class="box"><div><small>Profil şəkli (https:// link)</small><span id="pphoto" style="font-size:14px;color:var(--mut)"></span></div><button id="ephoto">✎</button></div>
+      <button class="pbtn" id="epwd">🔒 Şifrəni yenilə</button>
+      <button class="pbtn" id="logout" style="color:#f15c6d">⎋ Hesabdan çıxış</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="ch">
+      <button class="back" id="back"><svg viewBox="0 0 24 24"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg></button>
+      <div class="av clk" id="hav"></div>
+      <div class="clk" id="hbox" style="min-width:0"><div class="nm" id="title"></div><div class="sub" id="sub"></div></div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="info" id="info">
+      <div class="top"><button id="ix">✕</button><span>Kontakt məlumatı</span></div>
+      <div class="big"><div class="av" id="iav"></div><h3 id="inm"></h3><div class="s" id="iun"></div><div class="s" id="ist"></div></div>
+      <div class="rw"><small>Sinif və sektor</small><span id="icl"></span></div>
+      <button class="btn" id="imsg">💬 Mesaj yaz</button>
+      <button class="btn red" id="irep">🚩 Şikayət et</button>
+    </div>
+    <button class="down" id="down"><svg viewBox="0 0 24 24"><path d="M7.4 8.6 12 13.2l4.6-4.6L18 10l-6 6-6-6z"/></svg><i id="newc" class="hidden"></i></button>
+    <div class="rbar hidden" id="rbar"><div class="quote"><b id="rn"></b><span id="rt"></span></div><button id="rx">✕</button></div>
+    <div class="emo hidden" id="emo"></div>
+    <form id="form">
+      <button type="button" class="eb" id="eb" title="Emoji">😊</button>
+      <textarea id="inp" rows="1" maxlength="1000" placeholder="Mesaj yazın"></textarea>
+      <button class="send" title="Göndər"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+    </form>
+  </div>
+</div>
+
+<div class="ov hidden" id="ov"><div class="dlg"><h3 id="dt"></h3><input id="di"><div class="dbt"><button id="dc">Ləğv et</button><button id="dok">OK</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db, toEmail } from './firebase.js';
+import { onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { collection, addDoc, query, where, orderBy, limit, onSnapshot, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, Timestamp, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const $ = id => document.getElementById(id);
+// All user-provided text goes through textContent => no XSS.
+const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const ROOMS = [
+  { id: 'general', title: 'Ümumi Söhbət', sub: 'Bütün məktəb üçün', icon: '🌐' },
+  { id: 'az_sector', title: 'Azərbaycan Sektoru', sub: 'Az sektoru şagirdləri', icon: '🇦🇿', sector: 'az' },
+  { id: 'ru_sector', title: 'Rus Sektoru', sub: 'Rus sektoru şagirdləri', icon: '🇷🇺', sector: 'ru' }
+];
+const COLORS = ['#53bdeb', '#e0a458', '#c78bff', '#ff7a8a', '#5fd3a0', '#f2c94c', '#ff9f68', '#7fb2ff'];
+const colorOf = s => COLORS[[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length];
+const hm = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const dt = v => v && v.toDate ? v.toDate() : v ? new Date(v) : new Date();
+const touch = matchMedia('(pointer:coarse)').matches;
+let me, uid, users = [], room = null, mode = 'rooms', unsub, lim = 50, older = false, first = true, lastSend = 0;
+let previews = {}, unread = {}, seen = {}, replyTo = null, newCount = 0, ctx = {}, lastRead = {};
+let usersById = {}, online = {}, typingMap = {}, baseSub = '', infoUser = null, typingTimer, lastTypeWrite = 0, unsubT, wd;
+
+// ---------- helpers ----------
+function toast(t) { const e = $('toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('show'), 2600); }
+function ask(title, { input, type = 'text', ph = '', ok = 'OK', danger } = {}) {
+  return new Promise(res => {
+    const i = $('di'), done = v => { $('ov').classList.add('hidden'); res(v); };
+    $('dt').textContent = title; i.classList.toggle('hidden', !input); i.type = type; i.placeholder = ph; i.value = '';
+    $('dok').textContent = ok; $('dok').className = danger ? 'dng' : 'pri';
+    $('ov').classList.remove('hidden'); input && i.focus();
+    $('dok').onclick = () => done(input ? i.value.trim() : true);
+    $('dc').onclick = () => done(null);
+    $('ov').onclick = e => { if (e.target === $('ov')) done(null); };
+    i.onkeydown = e => { if (e.key === 'Enter') $('dok').click(); if (e.key === 'Escape') done(null); };
+  });
+}
+let ac;
+function beep() { try { ac = ac || new AudioContext(); const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 660; g.gain.setValueAtTime(.07, ac.currentTime); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .25); o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + .25); } catch {} }
+function linkify(p, text) {
+  const re = /https?:\/\/[^\s<]+/g; let i = 0, m;
+  while ((m = re.exec(text))) {
+    if (m.index > i) p.append(text.slice(i, m.index));
+    const a = h('a', null, m[0]); a.href = m[0]; a.target = '_blank'; a.rel = 'noopener noreferrer nofollow'; p.append(a);
+    i = m.index + m[0].length;
+  }
+  if (i < text.length) p.append(text.slice(i));
+}
+function avatar(b, name, url, icon) {
+  b.textContent = '';
+  if (url && /^https:\/\//.test(url)) { const i = h('img'); i.src = url; i.alt = ''; i.loading = 'lazy'; b.append(i); }
+  else b.textContent = icon || (name || '?')[0].toUpperCase();
+}
+const visibleRooms = () => ROOMS.filter(r => !r.sector || r.sector === me.sector || me.role === 'admin');
+const saveRead = () => { try { localStorage.setItem('lr_' + uid, JSON.stringify(lastRead)); } catch {} };
+function markRead(id) { lastRead[id] = Date.now(); unread[id] = false; saveRead(); title(); }
+function title() { document.title = (Object.values(unread).some(Boolean) ? '● ' : '') + 'Məktəb-Lisey'; }
+
+// ---------- auth + startup ----------
+onAuthStateChanged(auth, async u => {
+  if (!u) return location.replace('login.html');
+  uid = u.uid;
+  const s = await getDoc(doc(db, 'users', uid));
+  if (!s.exists()) { await signOut(auth); return; }
+  me = s.data();
+  try { lastRead = JSON.parse(localStorage.getItem('lr_' + uid)) || {}; } catch {}
+  drawProfile();
+  openRoom(ROOMS[0], true);                       // chat first, rest loads in the background
+  // live user list: newly registered users appear in "Söhbətlər" instantly
+  onSnapshot(collection(db, 'users'), s => {
+    usersById = {}; s.forEach(d => usersById[d.id] = { uid: d.id, ...d.data() });
+    users = Object.values(usersById).filter(u => u.uid !== uid).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    document.querySelectorAll('.mav').forEach(a => { const u = usersById[a.dataset.uid]; if (u) avatar(a, u.name, u.photoURL); });
+    if (mode === 'dm') renderList();
+    statusLine();
+  }, () => {});
+  // presence: heartbeat every 45s, count users seen in the last 100s
+  const beat = () => { if (!document.hidden) setDoc(doc(db, 'presence', uid), { at: serverTimestamp() }).catch(() => {}); };
+  const poll = async () => {
+    try {
+      const s = await getDocs(query(collection(db, 'presence'), where('at', '>', Timestamp.fromMillis(Date.now() - 100000))));
+      online = {}; s.forEach(d => online[d.id] = 1); online[uid] = 1;
+      $('onl').textContent = Object.keys(online).length + ' onlayn';
+      if (mode === 'dm') renderList();
+      statusLine();
+    } catch {}
+  };
+  beat(); setTimeout(poll, 1200);
+  setInterval(() => { beat(); poll(); }, 45000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { beat(); poll(); } });
+  setInterval(statusLine, 1500);
+  visibleRooms().forEach(r => onSnapshot(
+    query(collection(db, 'messages'), where('room', '==', r.id), orderBy('createdAt', 'desc'), limit(1)),
+    s => {
+      const d = s.docs[0], p0 = d ? d.data({ serverTimestamps: 'estimate' }) : null, p = p0 && p0.uid ? p0 : null;
+      previews[r.id] = p;
+      const t = p ? dt(p.createdAt).getTime() : 0, fresh = p && p.uid !== uid && t > (lastRead[r.id] || 0);
+      if (r.id === room && !document.hidden) markRead(r.id);
+      else { if (fresh && seen[r.id] && !unread[r.id]) beep(); unread[r.id] = !!fresh; title(); }
+      seen[r.id] = true;
+      if (mode === 'rooms') renderList();
+    }, () => {}));
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && room) markRead(room); });
+
+// ---------- list ----------
+function setMode(m) {
+  mode = m;
+  $('tab-rooms').classList.toggle('on', m === 'rooms'); $('tab-dm').classList.toggle('on', m === 'dm');
+  $('ptitle').textContent = m === 'rooms' ? 'İcmalar' : 'Söhbətlər';
+  $('search').value = ''; closeProfile(); renderList();
+}
+$('tab-rooms').onclick = () => setMode('rooms');
+$('tab-dm').onclick = () => setMode('dm');
+
+function renderList() {
+  if (!me) return;
+  const q = $('search').value.trim().toLowerCase(), list = $('list'), frag = document.createDocumentFragment();
+  const items = mode === 'rooms'
+    ? visibleRooms().map(r => { const p = previews[r.id]; return { ...r, last: p ? `${p.uid === uid ? 'Siz' : p.name}: ${p.text}` : r.sub, time: p ? hm(dt(p.createdAt)) : '' }; })
+    : users.map(u => ({ id: 'dm_' + [uid, u.uid].sort().join('_'), uid: u.uid, title: u.name, sub: '@' + u.username + ' • ' + u.schoolClass, last: online[u.uid] ? 'onlayn' : '@' + u.username + ' • ' + u.schoolClass, url: u.photoURL }));
+  items.filter(i => (i.title + ' ' + i.sub).toLowerCase().includes(q)).forEach(i => {
+    const row = h('div', 'item' + (i.id === room ? ' on' : '') + (unread[i.id] ? ' unread' : '')), a = h('div', 'av'), body = h('div', 'body'), r1 = h('div', 'row1'), tm = h('div', 'tm', i.time || '');
+    avatar(a, i.title, i.url, i.icon);
+    if (i.uid && online[i.uid]) a.classList.add('on');
+    if (unread[i.id]) tm.append(h('span', 'dot'));
+    r1.append(h('div', 't', i.title), tm); body.append(r1, h('div', 's', i.last)); row.append(a, body);
+    row.onclick = () => openRoom(i);
+    frag.append(row);
+  });
+  list.textContent = '';
+  list.append(frag.children.length ? frag : h('div', 'empty', 'Heç nə tapılmadı.'));
+}
+$('search').oninput = renderList;
+
+function openRoom(i, quiet) {
+  stopTyping(); room = i.id; lim = 50; baseSub = i.sub; setReply(null); $('emo').classList.add('hidden'); closeInfo();
+  $('title').textContent = i.title; avatar($('hav'), i.title, i.url, i.icon);
+  box.classList.toggle('grp', !room.startsWith('dm_'));
+  if (!quiet) $('app').classList.add('in-chat');
+  markRead(room); renderList(); subscribe(); listenTyping(); statusLine();
+  if (!touch && !quiet) $('inp').focus();
+}
+$('back').onclick = () => $('app').classList.remove('in-chat');
+
+// ---------- messages ----------
+const box = $('msgs');
+const atBottom = () => box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+const toBottom = smooth => box.scrollTo({ top: box.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+function updateDown() { $('down').classList.toggle('show', !atBottom()); $('newc').classList.toggle('hidden', !newCount); $('newc').textContent = newCount; }
+box.onscroll = () => { if (atBottom()) newCount = 0; updateDown(); };
+$('down').onclick = () => { newCount = 0; toBottom(true); };
+
+function tickEl(d) { const p = d.metadata.hasPendingWrites; return h('span', 'tick' + (p ? ' p' : ''), p ? '🕓' : '✓✓'); }
+const build = (d, a) => { try { return build0(d, a); } catch (e) { console.error(e); return []; } };
+function build0(d, anim) {
+  const m = d.data({ serverTimestamps: 'estimate' }); if (!m.uid) return []; const t = dt(m.createdAt), ds = t.toDateString(), out = [];
+  if (ds !== ctx.day) {
+    ctx.day = ds; ctx.uid = null;
+    out.push(h('div', 'day', ds === new Date().toDateString() ? 'Bu gün' : ds === new Date(Date.now() - 864e5).toDateString() ? 'Dünən' : t.toLocaleDateString()));
+  }
+  const mine = m.uid === uid, isFirst = ctx.uid !== m.uid || t - ctx.t > 3e5; ctx.uid = m.uid; ctx.t = t;
+  const b = h('div', 'msg ' + (mine ? 'out' : 'in') + (isFirst ? ' first' : '') + (anim ? ' new' : '')); b.id = 'm_' + d.id;
+  if (!mine && isFirst && !room.startsWith('dm_')) {
+    const w = h('div', 'who', m.name); w.style.color = colorOf(m.uid); w.onclick = e => { e.stopPropagation(); showInfo(m.uid); }; b.append(w);
+    const a = h('div', 'av mav clk'); a.dataset.uid = m.uid; avatar(a, m.name, usersById[m.uid]?.photoURL); a.onclick = e => { e.stopPropagation(); showInfo(m.uid); }; b.append(a);
+  }
+  if (m.reply) { const q = h('div', 'quote'); q.append(h('b', null, m.reply.name), h('span', null, m.reply.text)); b.append(q); }
+  const txt = h('span'); linkify(txt, m.text);
+  const meta = h('span', 'meta', hm(t)); if (mine) meta.append(tickEl(d));
+  b.append(txt, meta);
+  const acts = h('div', 'acts'), rb = h('button', null, '↩'); rb.title = 'Cavab ver';
+  rb.onclick = e => { e.stopPropagation(); setReply({ name: m.name, text: m.text.slice(0, 120) }); };
+  acts.append(rb);
+  if (!mine) { const fb = h('button', null, '🚩'); fb.title = 'Şikayət et'; fb.onclick = e => { e.stopPropagation(); report({ uid: m.uid, name: m.name, username: m.username }, m.text); }; acts.append(fb); }
+  if (mine || me.role === 'admin') {
+    const x = h('button', null, '🗑'); x.title = 'Sil';
+    x.onclick = async e => { e.stopPropagation(); if (await ask('Mesaj silinsin?', { ok: 'Sil', danger: true })) deleteDoc(d.ref).catch(() => toast('Silmək mümkün olmadı')); };
+    acts.append(x);
+  }
+  b.append(acts); b.onclick = () => b.classList.toggle('sel');
+  b.ondblclick = () => setReply({ name: m.name, text: m.text.slice(0, 120) });
+  out.push(b); return out;
+}
+
+function skeleton() { box.textContent = ''; for (let i = 0; i < 6; i++) { const s = h('div', 'sk' + (i % 3 ? '' : ' r')); s.style.width = 30 + (i * 17) % 40 + '%'; box.append(s); } }
+
+function subscribe() {
+  unsub && unsub(); first = true; newCount = 0; skeleton();
+  clearTimeout(wd);
+  wd = setTimeout(() => { if (first) { const b = h('button', 'more', 'Yenidən cəhd et'); b.onclick = subscribe; box.textContent = ''; box.append(h('div', 'day', 'Mesajlar yüklənmir. İnterneti və Firestore indeksini yoxlayın.'), b); } }, 12000);
+  const q = query(collection(db, 'messages'), where('room', '==', room), orderBy('createdAt', 'desc'), limit(lim));
+  unsub = onSnapshot(q, { includeMetadataChanges: true }, snap => {
+    const changes = snap.docChanges({ includeMetadataChanges: true });
+    if (first || older || changes.some(c => c.type === 'removed')) {
+      // full render: first load, "load older", or a deletion
+      const prevH = box.scrollHeight, prevT = box.scrollTop, frag = document.createDocumentFragment();
+      ctx = {};
+      if (snap.size >= lim) { const b = h('button', 'more', 'Əvvəlki mesajlar'); b.onclick = () => { lim += 50; older = true; subscribe(); }; frag.append(b); }
+      if (!snap.size) { const e = h('div', 'day', 'Hələ mesaj yoxdur. İlk yazan siz olun!'); e.id = 'emptynote'; frag.append(e); }
+      snap.docs.slice().reverse().forEach(d => frag.append(...build(d)));
+      box.textContent = ''; box.append(frag);
+      if (older) { box.scrollTop = box.scrollHeight - prevH + prevT; older = false; }
+      else if (first) toBottom(false); else box.scrollTop = prevT;
+      first = false; clearTimeout(wd); updateDown(); return;
+    }
+    // incremental: only touch what changed (fast, no flicker)
+    changes.forEach(c => {
+      const d = c.doc;
+      if (c.type === 'added' && !$('m_' + d.id)) {
+        const wasBottom = atBottom(), mine = d.data().uid === uid;
+        $('emptynote')?.remove();
+        box.append(...build(d, true));
+        if (mine || wasBottom) toBottom(true); else { newCount++; updateDown(); }
+        if (!mine && !d.metadata.hasPendingWrites && document.hidden) beep();
+      } else if (c.type === 'modified') {
+        const t = $('m_' + d.id)?.querySelector('.tick');
+        if (t) { const p = d.metadata.hasPendingWrites; t.textContent = p ? '🕓' : '✓✓'; t.className = 'tick' + (p ? ' p' : ''); }
+      }
+    });
+  }, err => { box.textContent = ''; box.append(h('div', 'day', 'Xəta: ' + err.message)); });
+}
+
+// ---------- composer ----------
+function setReply(r) {
+  replyTo = r; $('rbar').classList.toggle('hidden', !r);
+  if (r) { $('rn').textContent = r.name; $('rt').textContent = r.text; $('inp').focus(); }
+}
+$('rx').onclick = () => setReply(null);
+const inp = $('inp');
+inp.oninput = () => {
+  inp.style.height = '42px'; inp.style.height = Math.min(inp.scrollHeight, 120) + 'px';
+  inp.value.trim() ? typed() : stopTyping();
+};
+inp.onkeydown = e => {
+  if (e.key === 'Escape') { setReply(null); $('emo').classList.add('hidden'); }
+  if (e.key === 'Enter' && !e.shiftKey && !touch) { e.preventDefault(); $('form').requestSubmit(); }
+};
+$('emo').append(...Array.from('😀😁😂🤣😊😍😘😎🤔😅😭😡👍👎👏🙏💪🔥✨🎉❤️💔🥳😴🤗😬🙄😇🤝👋🙌💯✅❌📚✏️🏫🎒⚽🎮🎵🍕☕').map(e => {
+  const b = h('button', null, e); b.type = 'button';
+  b.onclick = () => { const s = inp.selectionStart; inp.setRangeText(e, s, inp.selectionEnd, 'end'); inp.oninput(); if (!touch) inp.focus(); };
+  return b;
+}));
+$('eb').onclick = () => $('emo').classList.toggle('hidden');
+
+$('form').onsubmit = async e => {
+  e.preventDefault();
+  const text = inp.value.trim();
+  if (!text || !room) return;
+  if (Date.now() - lastSend < 800) return toast('Çox tez yazırsınız 🙂');
+  lastSend = Date.now(); inp.value = ''; inp.oninput(); $('emo').classList.add('hidden');
+  const data = { text, room, uid, name: me.name, username: me.username, createdAt: serverTimestamp() };
+  if (replyTo) data.reply = replyTo;
+  setReply(null);
+  try { await addDoc(collection(db, 'messages'), data); }
+  catch (err) { toast(err.code === 'permission-denied' ? 'Göndərilə bilmədi. Hesabınız bloklanmış ola bilər.' : 'Göndərilmədi: ' + err.message); }
+};
+
+// ---------- typing indicator ----------
+const peerOf = () => room && room.startsWith('dm_') ? usersById[room.split('_').find(x => x !== 'dm' && x !== uid)] : null;
+function statusLine() {
+  if (!room) return;
+  const now = Date.now(), s = $('sub'), names = Object.values(typingMap).filter(x => now - x.at < 6000).map(x => (x.name || '').split(' ')[0]);
+  if (names.length) {
+    s.textContent = room.startsWith('dm_') ? 'yazır...' : names.length > 2 ? names.length + ' nəfər yazır...' : names.join(', ') + ' yazır...';
+    s.classList.add('typing'); return;
+  }
+  s.classList.remove('typing');
+  const p = peerOf(); s.textContent = p ? (online[p.uid] ? 'onlayn' : '@' + p.username + ' • ' + p.schoolClass) : baseSub;
+}
+const tdoc = () => doc(db, 'typing', room + '__' + uid);
+function typed() {
+  if (!room) return;
+  const n = Date.now();
+  if (n - lastTypeWrite > 2500) { lastTypeWrite = n; setDoc(tdoc(), { room, uid, name: me.name, at: serverTimestamp() }).catch(() => {}); }
+  clearTimeout(typingTimer); typingTimer = setTimeout(stopTyping, 4000);
+}
+function stopTyping() { clearTimeout(typingTimer); if (lastTypeWrite && room) { lastTypeWrite = 0; deleteDoc(tdoc()).catch(() => {}); } }
+function listenTyping() {
+  unsubT && unsubT(); typingMap = {};
+  unsubT = onSnapshot(query(collection(db, 'typing'), where('room', '==', room)), s => {
+    typingMap = {};
+    s.forEach(d => { const x = d.data({ serverTimestamps: 'estimate' }); if (x.uid !== uid) typingMap[x.uid] = { name: x.name, at: dt(x.at).getTime() }; });
+    statusLine();
+  }, () => {});
+}
+addEventListener('pagehide', stopTyping);
+
+// ---------- contact info + report ----------
+function showInfo(id) {
+  const u = usersById[id]; if (!u) return toast('Məlumat tapılmadı');
+  infoUser = u; avatar($('iav'), u.name, u.photoURL); $('iav').classList.toggle('on', !!online[id]);
+  $('inm').textContent = u.name; $('iun').textContent = '@' + u.username; $('ist').textContent = online[id] ? 'onlayn' : 'oflayn';
+  $('icl').textContent = `${u.schoolClass} (${u.sector === 'az' ? 'Azərbaycan' : 'Rus'} sektoru)`;
+  const self = id === uid; $('imsg').classList.toggle('hidden', self); $('irep').classList.toggle('hidden', self);
+  $('info').classList.add('show');
+}
+function closeInfo() { $('info').classList.remove('show'); }
+$('ix').onclick = closeInfo;
+$('hbox').onclick = $('hav').onclick = () => { const p = peerOf(); if (p) showInfo(p.uid); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeInfo(); });
+$('imsg').onclick = () => {
+  if (!infoUser) return; const u = infoUser; closeInfo(); setMode('dm');
+  openRoom({ id: 'dm_' + [uid, u.uid].sort().join('_'), uid: u.uid, title: u.name, sub: '@' + u.username + ' • ' + u.schoolClass, url: u.photoURL });
+};
+$('irep').onclick = () => infoUser && report(infoUser);
+async function report(u, msgText) {
+  const reason = await ask('Şikayət səbəbi: ' + u.name, { input: true, ph: 'Qısa izah edin', ok: 'Göndər', danger: true });
+  if (!reason) return;
+  const d = { reporter: uid, reporterName: me.name, target: u.uid, targetName: u.name, targetUsername: u.username || '', reason: reason.slice(0, 300), createdAt: serverTimestamp() };
+  if (msgText) d.msgText = msgText.slice(0, 300);
+  try { await addDoc(collection(db, 'reports'), d); toast('✔️ Şikayət göndərildi'); } catch { toast('Göndərilə bilmədi'); }
+}
+
+// ---------- profile ----------
+function drawProfile() {
+  avatar($('railav'), me.name, me.photoURL); avatar($('pav'), me.name, me.photoURL);
+  $('pname').textContent = me.name; $('puser').textContent = '@' + me.username;
+  $('pclass').textContent = `${me.schoolClass} (${me.sector === 'az' ? 'Azərbaycan' : 'Rus'} sektoru)`;
+  $('pphoto').textContent = me.photoURL ? 'Şəkil təyin edilib' : 'Yoxdur';
+}
+const closeProfile = () => { $('profview').classList.add('hidden'); $('listview').classList.remove('hidden'); };
+$('railav').onclick = () => { $('listview').classList.add('hidden'); $('profview').classList.remove('hidden'); };
+$('pback').onclick = closeProfile;
+
+async function edit(field) {
+  const v = await ask(field === 'name' ? 'Yeni ad və soyad' : 'Şəklin https:// linki (boş = sil)', { input: true, ok: 'Yadda saxla' });
+  if (v === null) return;
+  if (field === 'name' && (v.length < 2 || v.length > 40)) return toast('Ad 2–40 simvol olmalıdır');
+  if (field === 'photoURL' && v && !/^https:\/\/\S+$/.test(v)) return toast('Link https:// ilə başlamalıdır');
+  try { await updateDoc(doc(db, 'users', uid), { [field]: v }); me[field] = v; drawProfile(); toast('✔️ Yeniləndi'); }
+  catch (err) { toast('Xəta: ' + err.message); }
+}
+$('ename').onclick = () => edit('name');
+$('ephoto').onclick = () => edit('photoURL');
+$('epwd').onclick = async () => {
+  const old = await ask('Köhnə şifrə', { input: true, type: 'password' }); if (!old) return;
+  const nw = await ask('Yeni şifrə (min. 6 simvol, 1 böyük, 1 kiçik hərf, 1 rəqəm)', { input: true, type: 'password', ok: 'Yenilə' }); if (!nw) return;
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(nw)) return toast('❌ Şifrə tələblərə cavab vermir!');
+  try {
+    await reauthenticateWithCredential(auth.currentUser, EmailAuthProvider.credential(toEmail(me.username), old));
+    await updatePassword(auth.currentUser, nw); toast('✔️ Şifrə yeniləndi!');
+  } catch { toast('❌ Köhnə şifrə səhvdir.'); }
+};
+$('logout').onclick = () => signOut(auth);
+</script>
+</body>
+</html>
